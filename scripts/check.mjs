@@ -74,7 +74,7 @@ try{
  const {default:App}=await server.ssrLoadModule('/src/App.jsx');
  const {default:React}=await import('react');const {renderToStaticMarkup}=await import('react-dom/server');
  const routes=['/','/statistics','/statistics/basics','/statistics/variables','/statistics/distributions','/statistics/choose','/statistics/methods','/statistics/checks','/statistics/tools','/statistics/python',...methods.map(m=>`/statistics/method/${m.id}`)];
- let homeHTML='';
+ let homeHTML='',basicsHTML='',legacyDistributionHTML='';
  for(const route of routes){
   globalThis.location={hash:`#${route}`};
   const html=renderToStaticMarkup(React.createElement(App));
@@ -82,7 +82,10 @@ try{
   for(const m of html.matchAll(/href="#(\/[^\"]*)"/g))assert.ok(routes.includes(m[1]),`Invalid route ${m[1]}`);
   for(const m of html.matchAll(/href="\/learning\/(data\/[^\"]*)"/g))await access(`public/${m[1]}`);
   if(route==='/')homeHTML=html;
+  if(route==='/statistics/basics')basicsHTML=html;
+  if(route==='/statistics/distributions')legacyDistributionHTML=html;
  }
+ assert.equal(legacyDistributionHTML,basicsHTML,'Old distribution URL must open the merged basics lesson');
  assert.equal((homeHTML.match(/準備中/g)||[]).length,9);assert.ok(homeHTML.includes('デザイン学入門'));assert.ok(homeHTML.includes('ウェブインタラクション入門'));
  const {default:Chooser}=await server.ssrLoadModule('/src/Chooser.jsx');
  const html=renderToStaticMarkup(React.createElement(Chooser,{answers:{...compare,dependency:'repeated'},setAnswers:()=>{}}));

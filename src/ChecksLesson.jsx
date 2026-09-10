@@ -13,7 +13,7 @@ function CollinearityExplorer(){
 }
 const cautions=[
  ['独立性・対応','同じ人の10回の測定を、10人分として数えない。誰を、何回、どの集団で測ったかを確認する。','mixed','対応・繰り返し測定'],
- ['分布・残差','正規性などの仮定が、元の値・差・誤差のどれに関するものかを区別する。ヒストグラムやQ–Qプロット、残差の図を見る。',null,'分布と確率'],
+ ['分布・残差','正規性などの仮定が、元の値・差・誤差のどれに関するものかを区別する。ヒストグラムやQ–Qプロット、残差の図を見る。',null,'分布と確率の基礎'],
  ['多重共線性','説明変数同士に強い線形関係があると、係数の推定が不安定になりうる。変数の意味、相関、VIFを確認する。','regression','重回帰分析'],
  ['外れ値・欠測','入力間違いか、重要な観察かを調べる。有意差を出すために削除しない。除外基準と欠測処理を記録し、結論への影響を調べる。','describe','データの確認'],
  ['多重比較','比較を増やすと、誤って有意になる結果も出やすい。検証する問いを先に決め、目的に合う多重性の調整を考える。','anova','条件の比較'],
@@ -21,8 +21,8 @@ const cautions=[
  ['標準化・距離','単位の大きい項目が結果を支配することがある。標準化や、何を「似ている」と呼ぶかを先に検討する。','pca','主成分分析'],
  ['効果の大きさ・解釈','p値だけで結論を決めない。差や関係の大きさ、不確かさ、対象への一般化、因果関係と言えるかを考える。','paired','差と信頼区間'],
 ];
-export default function ChecksLesson(){return <><p className="eyebrow">06 / 解析前後の確認</p><h1>解析で注意すること</h1><p className="lede">ソフトが結果を返しても、その解析がデータに合っているとは限りません。何を仮定して、何を確かめる必要があるのかを整理しておきましょう。</p>
- <Section title="まず押さえておく注意点"><div className="reference-list">{cautions.map(([name,body,id,label])=><article key={name}><h3>{name}</h3><p>{body}</p><a href={id?`#/statistics/method/${id}`:'#/statistics/distributions'}>{label} →</a></article>)}</div></Section>
+export default function ChecksLesson(){return <><p className="eyebrow">05 / 解析前後の確認</p><h1>解析で注意すること</h1><p className="lede">ソフトが結果を返しても、その解析がデータに合っているとは限りません。何を仮定して、何を確かめる必要があるのかを整理しておきましょう。</p>
+ <Section title="まず押さえておく注意点"><div className="reference-list">{cautions.map(([name,body,id,label])=><article key={name}><h3>{name}</h3><p>{body}</p><a href={id?`#/statistics/method/${id}`:'#/statistics/basics'}>{label} →</a></article>)}</div></Section>
  <Section title="多重共線性って、何？"><p>椅子の価格を、幅や奥行きから説明したいとします。幅の広い椅子は奥行きも大きい、といった強い関係があると、価格との関係を幅と奥行きそれぞれにどう割り振るかが難しくなります。</p><p>このように、説明変数同士に強い線形関係がある状態が<strong>多重共線性</strong>です。回帰係数の標準誤差が大きくなったり、少しデータを変えただけで係数の大きさや符号が変わったりします。幅をcmとmmの両方で入れるような完全な重複では、係数を一意に決められません。</p><CollinearityExplorer/><p>VIFは、通常の線形回帰で、共線性によって係数の推定の分散がどれだけ膨らむかを表す指標です。ある説明変数をほかの説明変数でどれだけ説明できるかから計算します。値が大きいことは確認のきっかけになりますが、「5や10を超えたら必ず削除」という機械的なルールではありません。</p><p><strong>係数を解釈したいのか、予測したいのか</strong>で対処は変わります。測っている内容に基づいて変数を整理する、指標をまとめる、リッジ回帰などを検討する方法があります。予測が安定する場合でも、個々の係数を原因の強さとして読めるとは限りません。</p></Section>
  <Section title="手法ごとに、仮定するものが違う"><div className="table-scroll"><table className="data-table"><thead><tr><th>手法</th><th>主に確かめること</th></tr></thead><tbody>
  <tr><th>Welchのt検定</th><td>2群と観測の独立性。小標本では分布や極端な値の影響。等分散は仮定しない。</td></tr>
