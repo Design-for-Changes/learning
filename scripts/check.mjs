@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile, access } from 'node:fs/promises';
-import { mean,median,variance,regression,pca2,projectionVariance,chairPoints,pairedTimes } from '../src/math.js';
+import { mean,median,variance,regression,pca2,projectionVariance,chairPoints,pairedTimes,normalPDF,normalCDF,normalProbability,twoPredictorVIF,correlatedPoints } from '../src/math.js';
 import { questionsFor,recommend,validateAnswers,changeAnswer } from '../src/chooser.js';
 import { methods } from '../src/content.js';
 const close=(a,b,t=1e-9)=>assert.ok(Math.abs(a-b)<t,`${a} != ${b}`);
@@ -14,6 +14,24 @@ assert.ok(p.ratio>0&&p.ratio<=1);
 for(let d=-90;d<=90;d++)assert.ok(projectionVariance(p.centered,d*Math.PI/180)<=p.values[0]+1e-9);
 const diff=pairedTimes.a.map((v,i)=>v-pairedTimes.b[i]);close(mean(diff),5);close(Math.sqrt(variance(diff)),7.211102550927978);
 assert.equal(diff.filter(x=>x>0).length,8);assert.equal(diff.filter(x=>x<0).length,3);
+// Distribution areas and VIF must match known values, independently of the drawings.
+close(normalPDF(0),0.3989422804014327);
+close(normalCDF(0),0.5);
+close(normalProbability(-1,1),0.682689492137,2e-7);
+close(normalProbability(-2,2),0.954499736104,2e-7);
+close(normalProbability(1,5,3,2),normalProbability(-1,1));
+assert.ok(normalPDF(0,0,.3)>1);
+assert.equal(normalProbability(1,1),0);
+for(const sigma of [.3,1,2]){
+ const step=sigma/100,low=1-8*sigma;
+ const area=Array.from({length:1600},(_,i)=>normalPDF(low+(i+.5)*step,1,sigma)*step).reduce((a,b)=>a+b,0);
+ close(area,1,1e-8);
+}
+assert.throws(()=>normalPDF(0,0,0));assert.throws(()=>normalCDF(0,0,-1));
+assert.throws(()=>normalProbability(2,1));assert.throws(()=>twoPredictorVIF(1.01));
+close(twoPredictorVIF(0),1);close(twoPredictorVIF(.9),5.263157894736842);
+close(twoPredictorVIF(.99),50.251256281407);assert.equal(twoPredictorVIF(1),Infinity);
+for(const r of [-.99,-.5,0,.3,.9,.99])close(regression(correlatedPoints(r)).r,r);
 const compare={response:'yes',goal:'compare',outcome:'numeric',dependency:'independent',groups:'two'};
 const ids=a=>recommend(a).candidates.map(x=>x.id);
 assert.deepEqual(ids(compare),['welch']);assert.deepEqual(ids({...compare,dependency:'repeated'}),['paired']);
@@ -55,7 +73,7 @@ const server=await createServer({server:{middlewareMode:true,watch:null,ws:false
 try{
  const {default:App}=await server.ssrLoadModule('/src/App.jsx');
  const {default:React}=await import('react');const {renderToStaticMarkup}=await import('react-dom/server');
- const routes=['/','/statistics','/statistics/basics','/statistics/variables','/statistics/choose','/statistics/methods','/statistics/python',...methods.map(m=>`/statistics/method/${m.id}`)];
+ const routes=['/','/statistics','/statistics/basics','/statistics/variables','/statistics/distributions','/statistics/choose','/statistics/methods','/statistics/checks','/statistics/tools','/statistics/python',...methods.map(m=>`/statistics/method/${m.id}`)];
  let homeHTML='';
  for(const route of routes){
   globalThis.location={hash:`#${route}`};
