@@ -22,10 +22,7 @@ const subjects = [
 ];
 function Portal(){
  return <main id="main" className="home" tabIndex="-1">
-  <section className="portal-masthead">
-   <div className="portal-title"><p className="eyebrow">動態デザイン研究室 / Learning</p><h1>学習資料</h1></div>
-   <div className="portal-intro"><p>研究を進めるために必要な知識を、ここから。まずは全体像をつかみ、図を動かし、手を動かして確かめてみましょう。</p><a href="#/statistics">統計解析入門をひらく <span aria-hidden="true">↗</span></a></div>
-  </section>
+  <h1 className="visually-hidden">学習資料</h1>
   <div className="portal-grid">{subjects.map(([name,description],i)=><article className={`subject ${i===0?'available':''}`} key={name}>
    <div className="subject-meta"><span className="course-no">{String(i+1).padStart(2,'0')}</span><span>{i===0?'学習する':'準備中'}</span></div>
    <h2>{i===0?<a href="#/statistics">{name}</a>:name}</h2><p>{description}</p>
